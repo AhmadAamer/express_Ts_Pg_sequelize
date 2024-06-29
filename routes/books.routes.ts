@@ -9,7 +9,7 @@ import {
 import { protect } from "../controllers/auth.controller";
 import { isAdmin } from "../middleware/isAdmin.middleware";
 const router = express.Router();
-router.post("/", protect, isAdmin, createBook);
+router.post("/", createBook);
 router.get("/", getAllBooks);
 router.delete("/", deleteAllBooks);
 router.delete("/:id", deleteBookById);

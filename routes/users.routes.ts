@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  //   createUser,
+  createUser,
   deleteAllUsers,
   deleteUserById,
   getAllUsers,
@@ -8,7 +8,7 @@ import {
 } from "../controllers/user.controller";
 import { protect } from "../controllers/auth.controller";
 const router = express.Router();
-// router.post("/", createUser);
+router.post("/", createUser);
 router.get("/", protect, getAllUsers);
 router.delete("/", deleteAllUsers);
 router.delete("/:id", deleteUserById);

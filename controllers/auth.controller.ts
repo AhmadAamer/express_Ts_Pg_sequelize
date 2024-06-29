@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { where } from "sequelize";
+import * as jwt from "jsonwebtoken";
+
 const { promisify } = require("util");
 
 declare namespace Express {
@@ -31,13 +31,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       type,
     });
     (await newUser).save();
+    console.log(password, newUser);
 
     const payload = {
-      email: (await newUser).email,
       id: (await newUser).id,
     };
 
-    const token = jwt.sign(payload, "secret😂", {
+    const token = jwt.sign(payload, process.env.JWT_SECRET!, {
       //some options..
       algorithm: "HS256",
       // expiresIn: "1h",
@@ -61,12 +61,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!user) {
       res.status(401).json({
         message:
-          "Invalid credentials..email or password is wrong ,, i won't tell you which one is wrong😎",
+          "Invalid credentials..email  is wrong ,, i won't tell you which one is wrong😎",
       });
       return;
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log(password, user.password);
 
     if (!passwordMatch) {
       res.status(401).json({
@@ -82,7 +83,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     const secret = process.env.SECRET_KEY;
 
-    const token = jwt.sign(payload, "secret😂", {
+    const token = jwt.sign(payload, process.env.JWT_SECRET!, {
       //some options..
       algorithm: "HS256",
       expiresIn: "1h",
@@ -114,13 +115,13 @@ export const protect = async (
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
-  const payload = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  // console.log(payload.id);
-  const currentUser = await User.findOne({ where: { id: payload.id } });
+  console.log(token, process.env.JWT_SECRET);
+  const payload = <{ id: string }>jwt.verify(token, process.env.JWT_SECRET!);
+  const currentUser = await User.findOne({ where: { id: payload!.id } });
   if (!currentUser) {
     res.status(401).json({ message: "Unauthorized" });
   }
 
-  // req.user = currentUser;
+  req.user = currentUser;
   next();
 };

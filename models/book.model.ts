@@ -1,11 +1,20 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript";
-
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  BelongsToMany,
+  PrimaryKey,
+  Default,
+} from "sequelize-typescript";
+import User from "./user.model";
+import BookUser from "./bookuser.model";
 @Table({ tableName: "books", timestamps: false })
 export default class Book extends Model {
+  @PrimaryKey
+  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
-    defaultValue: DataType.UUIDV4,
-    primaryKey: true,
   })
   id: string;
   @Column
@@ -16,6 +25,6 @@ export default class Book extends Model {
   price: number;
   @Column({ type: DataType.INTEGER })
   quantity: number;
-  @Column
-  booked: boolean;
+  @BelongsToMany(() => User, () => BookUser)
+  users!: User[];
 }

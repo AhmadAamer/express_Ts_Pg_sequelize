@@ -1,3 +1,4 @@
+import Book from "../models/book.model";
 import User from "../models/user.model";
 import { Request, Response } from "express";
 
@@ -5,7 +6,7 @@ export const getAllUsers = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const allUsers = await User.findAll({});
+  const allUsers = await User.findAll({ include: [Book] });
   try {
     res.status(200).json({
       numberOfUsers: allUsers.length ? allUsers.length : "there are no users",
@@ -18,29 +19,29 @@ export const getAllUsers = async (
   }
 };
 
-// export const createUser = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   console.log(req.body);
+export const createUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  console.log(req.body);
 
-//   const { name, email, password, type, reservedBooks } = req.body;
-//   const newUser = await User.create({
-//     name,
-//     email,
-//     password,
-//     type,
-//     reservedBooks,
-//   });
-//   await newUser.save();
-//   try {
-//     res.status(200).json({ resualt: "user created successfully", newUser });
-//   } catch {
-//     (err: Error) => {
-//       res.status(500).json({ error: err });
-//     };
-//   }
-// };
+  const { name, email, password, type, reservedBooks } = req.body;
+  const newUser = await User.create({
+    name,
+    email,
+    password,
+    type,
+    reservedBooks,
+  });
+  await newUser.save();
+  try {
+    res.status(200).json({ resualt: "user created successfully", newUser });
+  } catch {
+    (err: Error) => {
+      res.status(500).json({ error: err });
+    };
+  }
+};
 
 export const deleteAllUsers = async (
   req: Request,
